@@ -29,6 +29,11 @@ function main(){
     var myCanvas=document.getElementById('myWebGLCanvas');
     var GL;
     try {
+      // antialias
+      //    - 如果值为 true，并且实现支持抗锯齿，则绘图缓冲区将使用选择的技术（多样本/超样本）和质量执行抗锯齿。 
+      //    - 如果值为 false 或实现不支持抗锯齿，则不执行抗锯齿。
+      // depth
+      //    - 如果值为 true，拥有至少 16 位的深度缓冲区。如果值为 false，深度缓冲区不可用。
       GL=myCanvas.getContext('webgl', {antialias: false, depth: false});
     } catch(e) {
       alert('You are not WebGL compatible :(');
@@ -49,8 +54,17 @@ function main(){
     ]);
 
     //send vertices to the GPU :
+    // 创建一个 WebGLBuffer 对象。
+    // 缓冲对象（有时称为 VBOs）为 GLSL 着色器保存顶点属性数据。
     var quadVerticesVBO= GL.createBuffer();
+    // 如果 buffer 是由不同的 WebGLRenderingContext 生成的，会产生一个无效的操作错误。
+    // 将给定的 WebGLBuffer 对象绑定到给定的绑定点（目标），可以是 ARRAY_BUFFER，也可以是 ELEMENT_ARRAY_BUFFER。
+    // 给定的 WebGLBuffer 对象在其生命周期内只能绑定到 ARRAY_BUFFER 或 ELEMENT_ARRAY_BUFFER 目标中的一个。
+    // 试图将一个缓冲区对象绑定到另一个目标将产生无效的操作错误，并且当前绑定将保持不变。
     GL.bindBuffer(GL.ARRAY_BUFFER, quadVerticesVBO);
+    // void bufferData(GLenum target, [AllowShared] BufferSource? data, GLenum usage)
+    // 为传递的目标当前绑定的 WebGLBuffer 对象的大小设置为为传递的数据的大小，然后将数据的内容写入 buffer 对象。
+    // 如果传递的数据为空，则会生成一个无效值错误。
     GL.bufferData(GL.ARRAY_BUFFER, quadVertices, GL.STATIC_DRAW);
 
     //send indices to the GPU :
@@ -96,6 +110,7 @@ function main(){
 
     //link attributes :
     var _positionAttributePointer = GL.getAttribLocation(shaderProgram, "position");
+    // 在索引处启用顶点属性作为数组
     GL.enableVertexAttribArray(_positionAttributePointer);
 
     //link uniforms :
